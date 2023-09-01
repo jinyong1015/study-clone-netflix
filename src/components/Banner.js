@@ -2,9 +2,44 @@ import axios from '../api/axios';
 import React, { useEffect, useState } from 'react'
 import requests from '../api/requests';
 import "./Banner.css";
+import { styled } from 'styled-components';
+
+
+const Container = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+`;
+
+const HomeContainer = styled.div`
+  width: 100%;
+  height: 100%;
+`;
+
+// inline frame = Iframe (Iframe 요소를 이용하면 해당 웹 페이지 안에 어떠한 제한 없이 다른 페이지를 불러와서 삽입 가능)
+const Iframe = styled.iframe`
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  //opacity: 0.65;
+  border: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+`;
 
 const Banner = () => {
   const [movie, setMovie] = useState([]);
+  const [isClicked, setIsClicked] = useState(false);
 
   useEffect(() => {
     fetchData()
@@ -20,7 +55,7 @@ const Banner = () => {
 
     // 특정 영화의 더 상세한 정보 가져오기(비디오 정보)
     const { data : movieDetail } = await axios.get(`movie/${movieId}`, {
-      params: { append_to_response: "viedos"},
+      params: { append_to_response: "videos"},
     });
     setMovie(movieDetail);
     
@@ -29,6 +64,9 @@ const Banner = () => {
   const truncate = (str, n) => {
     return str?.length > n ? str.substr(0, n - 1) + "..." : str;
   };
+
+  console.log('movie', movie);
+  if (!isClicked) {
 
     return (
       <header
@@ -46,7 +84,7 @@ const Banner = () => {
 
         <div className="banner__buttons">
           <button
-            className="banner__button play"
+            className="banner__button play" onClick={() => setIsClicked(true)}
           >
             Play
           </button>
@@ -58,10 +96,26 @@ const Banner = () => {
         </h1>
       </div>
       <div className="banner--fadeBottom" />
-    </header>
+    </header> 
+  );
 
-    
-  )
+  } else {
+    return (
+      <Container>
+        <HomeContainer>
+          <Iframe
+            width="640"
+            height="360"
+            src={`https://www.youtube.com/embed/${movie.videos.results[0].key}?controls=0&autoplay=1&loop=1&mute=0&playlist=${movie.videos.results[0].key}`}
+            title="YouTube video player"
+            frameborder="0"
+            allow="autoplay; fullscreen"
+            allowfullscreen
+          ></Iframe>  
+        </HomeContainer>
+      </Container>
+    );
+  }
 }
 
 export default Banner;
