@@ -16,7 +16,7 @@ const Layout = () => {
       <Footer />
     </div>
   )
-}
+} 
 
 function App() {
   return (
